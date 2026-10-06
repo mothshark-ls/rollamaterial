@@ -43,6 +43,24 @@ local FoodConfig = require(
 local PICKUP_DISTANCE = 10
 
 --------------------------------------------------
+-- HELPERS
+--------------------------------------------------
+
+-- Food can be a single Part or a Model made of parts.
+local function getFoodPart(food)
+
+	if food:IsA("BasePart") then
+		return food
+	end
+
+	return food:FindFirstChildWhichIsA(
+		"BasePart",
+		true
+	)
+
+end
+
+--------------------------------------------------
 -- INITIALIZATION
 --------------------------------------------------
 
@@ -103,7 +121,7 @@ function FoodService:SpawnFoodAt(spawnPoint)
 
 	for _, template in ipairs(foodTemplates) do
 
-		if template:IsA("Model") then
+		if template:IsA("Model") or template:IsA("BasePart") then
 
 			local foodId = template:GetAttribute("FoodId")
 
@@ -166,11 +184,8 @@ function FoodService:SetupPickup(food)
 		return
 	end
 
-	-- Find a physical part inside the model.
-	local interactionPart = food:FindFirstChildWhichIsA(
-		"BasePart",
-		true
-	)
+	-- Find the physical part of the food.
+	local interactionPart = getFoodPart(food)
 
 	if not interactionPart then
 		warn(
@@ -234,7 +249,9 @@ function FoodService:CollectFood(player, food)
 	end
 
 	-- Make sure the food still exists in configuration.
-	if not FoodConfig[foodId] then
+	local foodData = FoodConfig[foodId]
+
+	if not foodData then
 		return
 	end
 
@@ -256,10 +273,7 @@ function FoodService:CollectFood(player, food)
 		return
 	end
 
-	local foodPart = food:FindFirstChildWhichIsA(
-		"BasePart",
-		true
-	)
+	local foodPart = getFoodPart(food)
 
 	if not foodPart then
 		return
