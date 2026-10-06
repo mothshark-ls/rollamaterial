@@ -1,20 +1,35 @@
 local GubbyConfig = {
 
+	--------------------------------------------------
+	-- STAGES
+	--------------------------------------------------
+
+	-- Ordered from smallest to largest. Id matches a Model in
+	-- ServerStorage.GubbyStages. RequiredFood is the shared food total
+	-- needed to reach the stage.
 	Stages = {
 
 		{
 			Id = "Tiny",
 			RequiredFood = 0,
-			Scale = 1,
 		},
 
 		{
 			Id = "Small",
 			RequiredFood = 10,
-			Scale = 1.5,
 		},
 
 	},
+
+	--------------------------------------------------
+	-- HUNGER
+	--------------------------------------------------
+
+	-- Seconds on the hunger timer when a run starts.
+	HungerStartTime = 30,
+
+	-- Seconds added to the hunger timer per food unit fed.
+	SecondsPerFood = 1,
 
 	--------------------------------------------------
 	-- FEEDING

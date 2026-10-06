@@ -178,6 +178,24 @@ function InventoryService:TakeFood(player, amount)
 end
 
 --------------------------------------------------
+-- CLEAR ALL
+--------------------------------------------------
+
+-- Empties every player's carried food. Used when the run restarts.
+function InventoryService:ClearAll()
+
+	for player, data in pairs(playerData) do
+
+		data.Food = 0
+		table.clear(data.Queue)
+
+		updateAttributes(player, data)
+
+	end
+
+end
+
+--------------------------------------------------
 -- GET FOOD
 --------------------------------------------------
 

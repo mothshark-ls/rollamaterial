@@ -157,8 +157,14 @@ Example: picking up Apple +1, Carrot +2, Carrot +2, then two +5 foods:
 - As it runs down he becomes **Hungry**, then **Angry**.
 - If it reaches zero, he **explodes** and the run is lost. The camera pans to
   him as it does for a stage change, but he explodes.
-- Timer length, how much feeding adds, and whether it scales with active
-  players are TBD (section 11).
+- **Current prototype:** the timer starts at `HungerStartTime` (30 s),
+  counts down 1 s at a time while players are in the server, and each food
+  unit fed adds `SecondsPerFood` (1 s). There is no cap and no
+  Hungry/Angry states yet.
+- **Current prototype:** at 0 the run restarts: Gubby returns to the first
+  stage with 0 food, everyone's carried food is cleared, the timer refills
+  and every player respawns. The explosion itself comes later.
+- Planned: the timer will scale with the number of active players.
 
 ### 7.3 Ending
 
@@ -193,10 +199,10 @@ The ending is uncertain. Ideas on the table:
 | `Workspace/Map/FoodZones` | Folder of flat zone Parts | Anchored, Transparency 1, CanCollide/CanTouch/CanQuery off, never tilted. Food spawns on the top face. A `ZoneType` attribute (`Short`, `Long`) picks the zone's settings from config. |
 | `Workspace/Food` | Folder for live food | Filled by the server only. Every player sees the same food; clients only add the hover and spin. |
 | Player attributes | `CarriedFood`, `FoodCapacity` | Set by the server. The UI reads these to show e.g. `3/15`. |
-| `Workspace/GubbySpawn` | Invisible Part (not made yet) | Will mark where Gubby's `Root` goes once stages swap models. Until then Gubby appears where his model was saved. |
-| `Workspace/Gubby` | The live Gubby | Cloned from the first stage by the server. Has a `GubbyFood` attribute with the shared total. |
+| `Workspace/Map/GubbySpawn` | Anchored Part | Gubby is placed so the bottom of his `Root` rests on its top face, centred, facing its front. Every stage uses it. |
+| `Workspace/Gubby` | The live Gubby | One Model for the whole game, made by the server. Its contents are swapped for the current stage's parts. Attributes: `GubbyFood` (shared total), `GubbyStage` (stage Id), `HungerTime` (seconds left). |
 | `ReplicatedStorage/FoodModels` | Food templates | Each is a Model with an invisible `Root` Part as PrimaryPart, a `FoodId` attribute matching `FoodConfig`, and all parts Anchored with CanCollide/CanTouch/CanQuery/CastShadow off. Kept in ReplicatedStorage so clients can clone them for the feeding animation. |
-| `ServerStorage/GubbyStages` | One Model per stage | Named after the stage IDs in `GubbyConfig`. Each has a `Root` PrimaryPart, a `Handle` (the visible Gubby, outlined on hover), and a `Mouth` point (an Attachment, Bone or anchored Part named `Mouth`). Visible parts keep CanQuery on so he can be clicked. |
+| `ServerStorage/GubbyStages` | One Model per stage | Named after the stage IDs in `GubbyConfig`. Each has a `Root` PrimaryPart (an invisible box around his body; its bottom is his feet), a `Handle` (the visible Gubby, outlined on hover), and a `Mouth` point (an Attachment, Bone or anchored Part named `Mouth`). Visible parts keep CanQuery on so he can be clicked. |
 | `ReplicatedStorage/GubbySounds` | Sound objects | `Eat`, `Chew`, `Burp`. |
 | `ReplicatedStorage/Remotes` | RemoteEvents | `GubbyFed` (server tells clients what was fed). Defined in `default.project.json`, so Rojo creates it. |
 

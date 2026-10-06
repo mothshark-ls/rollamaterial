@@ -27,6 +27,20 @@ local FoodService =
 		)
 	)
 
+local GrowthService =
+	require(
+		ServicesFolder:WaitForChild(
+			"GrowthService"
+		)
+	)
+
+local HungerService =
+	require(
+		ServicesFolder:WaitForChild(
+			"HungerService"
+		)
+	)
+
 local GubbyService =
 	require(
 		ServicesFolder:WaitForChild(
@@ -44,8 +58,14 @@ FoodService:Init(
 	InventoryService
 )
 
+GrowthService:Init()
+
+HungerService:Init()
+
 GubbyService:Init(
-	InventoryService
+	InventoryService,
+	GrowthService,
+	HungerService
 )
 
 --------------------------------------------------
@@ -56,4 +76,9 @@ InventoryService:Start()
 
 FoodService:Start()
 
+GrowthService:Start()
+
+-- Gubby must exist before the hunger timer writes its attribute to him.
 GubbyService:Start()
+
+HungerService:Start()

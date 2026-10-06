@@ -12,6 +12,9 @@
 	   Chew, then Burp. Food arriving before Burp restarts Eat and Chew.
 	   Sounds come from ReplicatedStorage.GubbySounds (Eat, Chew, Burp);
 	   any that are missing are skipped.
+
+	When Gubby changes stage his parts are replaced, so the outline and
+	sounds are re-attached to the new parts.
 ]]
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -51,6 +54,8 @@ local SOUNDS_WAIT_TIME = 5
 --------------------------------------------------
 
 local gubbyModel = nil
+local highlight = nil
+local soundsFolder = nil
 
 -- FoodId -> food model template.
 local foodTemplates = {}
@@ -135,6 +140,12 @@ function GubbyController:Start()
 
 	self:SetupOutline()
 
+	gubbyModel:GetAttributeChangedSignal("GubbyStage"):Connect(function()
+
+		self:AttachToStage()
+
+	end)
+
 	GubbyFedRemote.OnClientEvent:Connect(function(player, foodIds)
 
 		for _, foodId in ipairs(foodIds) do
@@ -148,7 +159,22 @@ function GubbyController:Start()
 
 	end)
 
-	self:SetupSounds()
+	soundsFolder = ReplicatedStorage:WaitForChild("GubbySounds", SOUNDS_WAIT_TIME)
+
+	self:AttachToStage()
+
+end
+
+--------------------------------------------------
+-- ATTACH TO STAGE
+--------------------------------------------------
+
+-- Points the outline and sounds at the current stage's parts.
+function GubbyController:AttachToStage()
+
+	highlight.Adornee = gubbyModel:FindFirstChild("Handle") or gubbyModel
+
+	self:AttachSounds()
 
 end
 
@@ -158,8 +184,7 @@ end
 
 function GubbyController:SetupOutline()
 
-	local highlight = Instance.new("Highlight")
-	highlight.Adornee = gubbyModel:FindFirstChild("Handle") or gubbyModel
+	highlight = Instance.new("Highlight")
 	highlight.FillTransparency = 1
 	highlight.OutlineColor = OUTLINE_COLOR
 	highlight.Enabled = false
@@ -187,11 +212,16 @@ end
 -- SOUNDS
 --------------------------------------------------
 
-function GubbyController:SetupSounds()
+function GubbyController:AttachSounds()
 
-	local soundsFolder = ReplicatedStorage:WaitForChild("GubbySounds", SOUNDS_WAIT_TIME)
+	for soundName, sound in pairs(sounds) do
+		sound:Destroy()
+		sounds[soundName] = nil
+	end
 
-	if not soundsFolder then
+	local soundParent = gubbyModel.PrimaryPart
+
+	if not soundsFolder or not soundParent then
 		return
 	end
 
@@ -202,7 +232,7 @@ function GubbyController:SetupSounds()
 		if sound and sound:IsA("Sound") then
 			-- Parent to Gubby so the sound comes from his position.
 			local gubbySound = sound:Clone()
-			gubbySound.Parent = gubbyModel.PrimaryPart
+			gubbySound.Parent = soundParent
 			sounds[soundName] = gubbySound
 		end
 
