@@ -1,0 +1,23 @@
+{
+  "name": "FeedGubbyOrElse",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Shared": {
+        "$path": "src/shared"
+      }
+    },
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Services": {
+        "$path": "src/server/Services"
+      },
+      "ServerBootstrap": {
+        "$path": "src/server/ServerBootstrap.server.luau"
+      }
+    }
+  }
+}
