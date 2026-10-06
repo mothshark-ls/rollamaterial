@@ -186,7 +186,7 @@ The ending is uncertain. Ideas on the table:
 
 | Location | What it is | Rules |
 |----------|------------|-------|
-| `Workspace/FoodZones` | Folder of flat zone Parts | Anchored, Transparency 1, CanCollide/CanTouch/CanQuery off, never tilted. Food spawns on the top face. A `ZoneType` attribute picks the zone's settings from config. |
+| `Workspace/Map/FoodZones` | Folder of flat zone Parts | Anchored, Transparency 1, CanCollide/CanTouch/CanQuery off, never tilted. Food spawns on the top face. A `ZoneType` attribute (`Short`, `Long`) picks the zone's settings from config. |
 | `Workspace/Food` | Folder for live food | Filled by code. |
 | `Workspace/GubbySpawn` | Invisible Part | Marks where Gubby's `Root` goes and which way he faces. |
 | `ServerStorage/FoodModels` | Food templates | Each is a Model with an invisible `Root` Part as PrimaryPart, a `FoodId` attribute matching `FoodConfig`, and all parts Anchored with CanCollide/CanTouch/CanQuery off. |

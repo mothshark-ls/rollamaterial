@@ -1,3 +1,4 @@
+-- FoodValue and Rarity are placeholders until the food roster is decided.
 local FoodConfig = {
 
 	Apple = {
@@ -5,23 +6,38 @@ local FoodConfig = {
 		Rarity = "Common",
 	},
 
-	Carrot = {
-		FoodValue = 2,
-		Rarity = "Common",
-	},
-
 	Orange = {
-		FoodValue = 3,
+		FoodValue = 1,
 		Rarity = "Common",
 	},
 
 	Pear = {
-		FoodValue = 4,
+		FoodValue = 2,
+		Rarity = "Common",
+	},
+
+	BloxyCola = {
+		FoodValue = 2,
 		Rarity = "Uncommon",
 	},
 
-	Melon = {
-		FoodValue = 10,
+	Taco = {
+		FoodValue = 3,
+		Rarity = "Uncommon",
+	},
+
+	Cheeseburger = {
+		FoodValue = 3,
+		Rarity = "Uncommon",
+	},
+
+	Pizza = {
+		FoodValue = 5,
+		Rarity = "Rare",
+	},
+
+	Watermelon = {
+		FoodValue = 5,
 		Rarity = "Rare",
 	},
 
