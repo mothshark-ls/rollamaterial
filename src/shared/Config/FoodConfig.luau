@@ -86,6 +86,22 @@ FoodConfig.ZoneTypes = {
 
 }
 
+-- Studs above the zone's top face where a food's Root is placed.
+FoodConfig.HoverHeight = 3
+
+--------------------------------------------------
+-- HOVER ANIMATION (client)
+--------------------------------------------------
+
+-- Studs the food bobs up and down from its spawn point.
+FoodConfig.BobHeight = 0.4
+
+-- Seconds for one full bob up and down.
+FoodConfig.BobPeriod = 2
+
+-- Degrees per second the food spins.
+FoodConfig.SpinSpeed = 45
+
 --------------------------------------------------
 -- PICKUP AND CARRYING
 --------------------------------------------------

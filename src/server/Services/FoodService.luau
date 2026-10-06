@@ -7,18 +7,18 @@
 	3. Collects food when a player is close enough and has room. Food a
 	   full player walks over stays on the ground.
 
-	Zones are Parts in Workspace.Map.FoodZones. Food spawns on a random
-	point of the zone's top face. The zone's ZoneType attribute picks its
-	settings from FoodConfig.ZoneTypes.
+	Zones are Parts in Workspace.Map.FoodZones. Food spawns HoverHeight
+	studs above a random point of the zone's top face. The zone's ZoneType
+	attribute picks its settings from FoodConfig.ZoneTypes.
 
-	Food templates are Models in ServerStorage.FoodModels with a Root
-	PrimaryPart and a FoodId attribute. All food data comes from
-	FoodConfig.
+	Food templates are Models in ReplicatedStorage.FoodModels with a Root
+	PrimaryPart and a FoodId attribute. They live in ReplicatedStorage so
+	clients can clone them for the feeding animation. All food data comes
+	from FoodConfig.
 ]]
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 
 local FoodService = {}
 
@@ -32,7 +32,7 @@ local FoodZonesFolder = workspace
 	:WaitForChild("Map")
 	:WaitForChild("FoodZones")
 
-local FoodModelsFolder = ServerStorage:WaitForChild("FoodModels")
+local FoodModelsFolder = ReplicatedStorage:WaitForChild("FoodModels")
 
 local FoodConfig = require(
 	ReplicatedStorage
@@ -199,7 +199,7 @@ end
 -- SPAWN FOOD
 --------------------------------------------------
 
--- Spawns one food on a random point of the zone's top face.
+-- Spawns one food above a random point of the zone's top face.
 -- Returns false if nothing could be spawned.
 function FoodService:SpawnFood(zone)
 
@@ -221,11 +221,11 @@ function FoodService:SpawnFood(zone)
 
 	local food = template:Clone()
 
-	-- Lift the food so its bottom rests on the surface.
-	local boxCFrame, boxSize = food:GetBoundingBox()
-	local pivotHeight = food:GetPivot().Position.Y - (boxCFrame.Position.Y - boxSize.Y / 2)
+	-- Stream the whole model to clients at once so it never shows up
+	-- half-loaded.
+	food.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 
-	food:PivotTo(CFrame.new(surfacePoint + Vector3.new(0, pivotHeight, 0)))
+	food:PivotTo(CFrame.new(surfacePoint + Vector3.new(0, FoodConfig.HoverHeight, 0)))
 
 	food.Parent = FoodFolder
 

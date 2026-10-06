@@ -25,6 +25,9 @@ local FoodConfig = require(
 
 local InventoryService = {}
 
+-- Prints each player's food counter to Output while there is no UI.
+local DEBUG_PRINT_COUNTER = true
+
 -- player -> { Food = number, Capacity = number, Queue = { { FoodId, Clicks } } }
 local playerData = {}
 
@@ -36,6 +39,10 @@ local function updateAttributes(player, data)
 
 	player:SetAttribute("CarriedFood", data.Food)
 	player:SetAttribute("FoodCapacity", data.Capacity)
+
+	if DEBUG_PRINT_COUNTER then
+		print(string.format("[Food] %s: %d/%d", player.Name, data.Food, data.Capacity))
+	end
 
 end
 
@@ -119,6 +126,54 @@ function InventoryService:AddFood(player, foodId, foodValue)
 	updateAttributes(player, data)
 
 	return true
+
+end
+
+--------------------------------------------------
+-- TAKE FOOD
+--------------------------------------------------
+
+-- Takes up to `amount` food for feeding Gubby. Each unit comes from the
+-- front of the pickup queue. Returns the FoodId of each unit taken, in
+-- pickup order. When the counter reaches 0 the queue is cleared.
+function InventoryService:TakeFood(player, amount)
+
+	local data = playerData[player]
+	local taken = {}
+
+	if not data then
+		return taken
+	end
+
+	while #taken < amount and data.Food > 0 do
+
+		local entry = data.Queue[1]
+
+		if not entry then
+			break
+		end
+
+		table.insert(taken, entry.FoodId)
+
+		entry.Clicks -= 1
+		data.Food -= 1
+
+		if entry.Clicks <= 0 then
+			table.remove(data.Queue, 1)
+		end
+
+	end
+
+	if data.Food <= 0 then
+		data.Food = 0
+		table.clear(data.Queue)
+	end
+
+	if #taken > 0 then
+		updateAttributes(player, data)
+	end
+
+	return taken
 
 end
 

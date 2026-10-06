@@ -16,6 +16,30 @@ local GubbyConfig = {
 
 	},
 
+	--------------------------------------------------
+	-- FEEDING
+	--------------------------------------------------
+
+	-- Distance in studs from the player's HumanoidRootPart to Gubby's
+	-- Root that allows clicking to feed.
+	FeedRadius = 25,
+
+	-- Food units fed per click.
+	FeedPerClick = 1,
+
+	--------------------------------------------------
+	-- FEED ANIMATION (client)
+	--------------------------------------------------
+
+	-- Studs in front of the player, towards Gubby, where food appears.
+	FeedStartDistance = 2,
+
+	-- Seconds for a food to float from the player to Gubby's mouth.
+	FeedFlightTime = 0.4,
+
+	-- Seconds between each queued food starting its flight.
+	FeedAnimationInterval = 0.12,
+
 }
 
 return GubbyConfig

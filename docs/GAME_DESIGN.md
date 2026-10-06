@@ -121,12 +121,16 @@ Example: picking up Apple +1, Carrot +2, Carrot +2, then two +5 foods:
 - Each click feeds **FeedPerClick** units (default 1). A future upgrade may
   raise this.
 - Each fed unit adds 1 to Gubby's shared food total.
-- An outline shows on Gubby while hovering him (planned).
+- Clicking uses a ClickDetector on Gubby, so the server receives the click
+  directly and re-checks the distance itself.
+- An outline shows around Gubby while the mouse is over him and the player
+  is within FeedRadius, so it also tells the player they can feed.
 
 ### 6.1 Feeding animation and sounds (client presentation)
 
-- Each fed unit plays one animation: the food (by FoodId) appears from inside
-  the player, floats to Gubby's mouth, and disappears on arrival.
+- Each fed unit plays one animation: the food (by FoodId) appears a short
+  distance in front of the player, floats to Gubby's mouth, and disappears
+  on arrival. Every player sees every feed.
 - Fed units go into an **animation queue** and are played with a short delay
   between each one. When one click feeds several units, they fly one after
   another instead of overlapping.
@@ -187,13 +191,14 @@ The ending is uncertain. Ideas on the table:
 | Location | What it is | Rules |
 |----------|------------|-------|
 | `Workspace/Map/FoodZones` | Folder of flat zone Parts | Anchored, Transparency 1, CanCollide/CanTouch/CanQuery off, never tilted. Food spawns on the top face. A `ZoneType` attribute (`Short`, `Long`) picks the zone's settings from config. |
-| `Workspace/Food` | Folder for live food | Filled by the server only. Every player sees the same food; clients only add animations. |
+| `Workspace/Food` | Folder for live food | Filled by the server only. Every player sees the same food; clients only add the hover and spin. |
 | Player attributes | `CarriedFood`, `FoodCapacity` | Set by the server. The UI reads these to show e.g. `3/15`. |
-| `Workspace/GubbySpawn` | Invisible Part | Marks where Gubby's `Root` goes and which way he faces. |
-| `ServerStorage/FoodModels` | Food templates | Each is a Model with an invisible `Root` Part as PrimaryPart, a `FoodId` attribute matching `FoodConfig`, and all parts Anchored with CanCollide/CanTouch/CanQuery off. |
-| `ServerStorage/GubbyStages` | One Model per stage | Named after the stage IDs in `GubbyConfig`. Each has a `Root` PrimaryPart at his feet and a `Mouth` point (an Attachment or a Bone named `Mouth`). Visible parts keep CanQuery on so he can be clicked. |
+| `Workspace/GubbySpawn` | Invisible Part (not made yet) | Will mark where Gubby's `Root` goes once stages swap models. Until then Gubby appears where his model was saved. |
+| `Workspace/Gubby` | The live Gubby | Cloned from the first stage by the server. Has a `GubbyFood` attribute with the shared total. |
+| `ReplicatedStorage/FoodModels` | Food templates | Each is a Model with an invisible `Root` Part as PrimaryPart, a `FoodId` attribute matching `FoodConfig`, and all parts Anchored with CanCollide/CanTouch/CanQuery/CastShadow off. Kept in ReplicatedStorage so clients can clone them for the feeding animation. |
+| `ServerStorage/GubbyStages` | One Model per stage | Named after the stage IDs in `GubbyConfig`. Each has a `Root` PrimaryPart, a `Handle` (the visible Gubby, outlined on hover), and a `Mouth` point (an Attachment, Bone or anchored Part named `Mouth`). Visible parts keep CanQuery on so he can be clicked. |
 | `ReplicatedStorage/GubbySounds` | Sound objects | `Eat`, `Chew`, `Burp`. |
-| `ReplicatedStorage/Remotes` | RemoteEvents | `FeedRequest`, `GameStateUpdated`. |
+| `ReplicatedStorage/Remotes` | RemoteEvents | `GubbyFed` (server tells clients what was fed). Defined in `default.project.json`, so Rojo creates it. |
 
 ## 11. Undecided
 
