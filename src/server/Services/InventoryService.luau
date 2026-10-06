@@ -1,110 +1,136 @@
 --[[
 	InventoryService
 
-	Stores the total amount of Food currently carried
-	by each player.
+	Tracks how much food each player is carrying.
 
-	Food is represented as one number.
+	Carried food is one number with a capacity, shown as e.g. 3/15.
+	A pickup queue remembers which foods were picked up, in order, so
+	feeding can show the right food. Each queue entry is worth a number
+	of clicks, and the clicks in the queue always add up to the carried
+	food.
 
-	Example:
-
-	Food = 18
-
-	The type of food collected does not matter after
-	pickup. FoodConfig determines how much Food the
-	picked-up object contributes.
+	CarriedFood and FoodCapacity are also set as player attributes so
+	the client can show them.
 ]]
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local FoodConfig = require(
+	ReplicatedStorage
+		:WaitForChild("Shared")
+		:WaitForChild("Config")
+		:WaitForChild("FoodConfig")
+)
 
 local InventoryService = {}
 
-local foodAmounts = {}
+-- player -> { Food = number, Capacity = number, Queue = { { FoodId, Clicks } } }
+local playerData = {}
+
+--------------------------------------------------
+-- HELPERS
+--------------------------------------------------
+
+local function updateAttributes(player, data)
+
+	player:SetAttribute("CarriedFood", data.Food)
+	player:SetAttribute("FoodCapacity", data.Capacity)
+
+end
+
+local function setupPlayer(player)
+
+	local data = {
+		Food = 0,
+		Capacity = FoodConfig.StartingCapacity,
+		Queue = {},
+	}
+
+	playerData[player] = data
+
+	updateAttributes(player, data)
+
+end
+
+--------------------------------------------------
+-- INITIALIZATION
+--------------------------------------------------
 
 function InventoryService:Init()
 
 end
 
+--------------------------------------------------
+-- START
+--------------------------------------------------
+
 function InventoryService:Start()
 
-	Players.PlayerAdded:Connect(function(player)
-
-		foodAmounts[player] = 0
-
-	end)
+	Players.PlayerAdded:Connect(setupPlayer)
 
 	Players.PlayerRemoving:Connect(function(player)
 
-		foodAmounts[player] = nil
+		playerData[player] = nil
 
 	end)
 
 	for _, player in ipairs(Players:GetPlayers()) do
 
-		foodAmounts[player] = 0
+		setupPlayer(player)
 
 	end
 
 end
 
-function InventoryService:AddFood(
-	player,
-	amount
-)
+--------------------------------------------------
+-- ADD FOOD
+--------------------------------------------------
 
-	if type(amount) ~= "number" then
+-- Adds a picked-up food. Only the space left is added, so a +2 food
+-- at 14/15 adds 1. Returns false if the player is full.
+function InventoryService:AddFood(player, foodId, foodValue)
+
+	local data = playerData[player]
+
+	if not data then
 		return false
 	end
 
-	if amount <= 0 then
+	if type(foodValue) ~= "number" or foodValue <= 0 then
 		return false
 	end
 
-	if not foodAmounts[player] then
+	local space = data.Capacity - data.Food
+
+	if space <= 0 then
 		return false
 	end
 
-	foodAmounts[player] =
-		foodAmounts[player] + amount
+	local amount = math.min(foodValue, space)
+
+	data.Food += amount
+
+	table.insert(data.Queue, {
+		FoodId = foodId,
+		Clicks = amount,
+	})
+
+	updateAttributes(player, data)
 
 	return true
 
 end
+
+--------------------------------------------------
+-- GET FOOD
+--------------------------------------------------
 
 function InventoryService:GetFood(player)
 
-	return foodAmounts[player] or 0
+	local data = playerData[player]
 
-end
-
-function InventoryService:RemoveFood(
-	player,
-	amount
-)
-
-	if type(amount) ~= "number" then
-		return false
-	end
-
-	if amount <= 0 then
-		return false
-	end
-
-	local currentFood =
-		foodAmounts[player]
-
-	if currentFood == nil then
-		return false
-	end
-
-	if currentFood < amount then
-		return false
-	end
-
-	foodAmounts[player] =
-		currentFood - amount
-
-	return true
+	return data and data.Food or 0
 
 end
 

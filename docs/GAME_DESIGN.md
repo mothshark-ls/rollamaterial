@@ -187,7 +187,8 @@ The ending is uncertain. Ideas on the table:
 | Location | What it is | Rules |
 |----------|------------|-------|
 | `Workspace/Map/FoodZones` | Folder of flat zone Parts | Anchored, Transparency 1, CanCollide/CanTouch/CanQuery off, never tilted. Food spawns on the top face. A `ZoneType` attribute (`Short`, `Long`) picks the zone's settings from config. |
-| `Workspace/Food` | Folder for live food | Filled by code. |
+| `Workspace/Food` | Folder for live food | Filled by the server only. Every player sees the same food; clients only add animations. |
+| Player attributes | `CarriedFood`, `FoodCapacity` | Set by the server. The UI reads these to show e.g. `3/15`. |
 | `Workspace/GubbySpawn` | Invisible Part | Marks where Gubby's `Root` goes and which way he faces. |
 | `ServerStorage/FoodModels` | Food templates | Each is a Model with an invisible `Root` Part as PrimaryPart, a `FoodId` attribute matching `FoodConfig`, and all parts Anchored with CanCollide/CanTouch/CanQuery off. |
 | `ServerStorage/GubbyStages` | One Model per stage | Named after the stage IDs in `GubbyConfig`. Each has a `Root` PrimaryPart at his feet and a `Mouth` point (an Attachment or a Bone named `Mouth`). Visible parts keep CanQuery on so he can be clicked. |
