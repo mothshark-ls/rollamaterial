@@ -20,9 +20,10 @@ local GubbyConfig = {
 	-- FEEDING
 	--------------------------------------------------
 
-	-- Distance in studs from the player's HumanoidRootPart to Gubby's
-	-- Root that allows clicking to feed.
-	FeedRadius = 25,
+	-- Click range: distance in studs from the player's HumanoidRootPart
+	-- to Gubby's Root that allows clicking to feed. Also controls when
+	-- the hover outline shows.
+	FeedRadius = 40,
 
 	-- Food units fed per click.
 	FeedPerClick = 1,
